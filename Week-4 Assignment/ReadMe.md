@@ -1,65 +1,45 @@
-# 📅 Week 4 Assignment
+# 🚀 AI API Tester (Streamlit App)
 
-## 📌 Overview
-This folder contains my Week 4 project for the Generative AI course.  
-The project focuses on building a **Gen AI application with authentication and API integration** using Python and Streamlit.
-
----
-
-## 🤖 Project: Agent.AI – Gen AI Application
-
-### 🧠 Description
-I developed a **Gen AI application** called **Agent.AI** using Python and Streamlit.
-
-This application allows users to:
-- Securely log in using email verification  
-- Connect their own API key  
-- Test and interact with AI models  
-
-The system ensures both **security and flexibility**, making it similar to real-world AI platforms.
+A simple and powerful **Gen AI API testing tool** built using **Python + Streamlit**.  
+This app allows users to securely connect their own API keys, test AI models, and optimize token usage efficiently.
 
 ---
 
-## 🔐 Authentication System
+## ✨ Features
 
-- Email-based login system  
-- OTP (verification code) sent to user email  
-- Secure verification before accessing the app  
-- Prevents unauthorized access  
+- 🔐 **User Authentication**
+  - Login system with email verification (OTP-based)
+  - Secure access before using the app
 
----
+- 🔗 **API Key Integration**
+  - Users can link their own API keys
+  - Supports testing of custom AI models
 
-## 🔑 API Key Integration
+- 💬 **Prompt Testing Interface**
+  - Ask questions and receive AI-generated responses
+  - Clean and interactive UI using Streamlit
 
-- Users can enter their own API key  
-- Enables personalized AI usage  
-- Supports testing different AI models  
-- Keeps user data private and secure  
+- 🎛️ **Response Customization**
+  - Adjust response length
+  - Control output to optimize token usage
 
----
+- 💰 **Token Saving Mode**
+  - Special mode to minimize token consumption
+  - Ideal for cost-efficient API usage
 
-## ⚙️ Features
-
-- 🔐 Secure login with email verification  
-- 📩 OTP-based authentication system  
-- 🔑 API key linking functionality  
-- 🤖 AI model interaction interface  
-- ⚡ Real-time responses using Streamlit  
-- 🧑‍💻 Clean and interactive UI  
+- ⚡ **Real-Time Responses**
+  - Fast and responsive interaction with AI models
 
 ---
 
-## 🛠️ Technologies Used
+## 🛠️ Tech Stack
 
-- Python  
-- Streamlit  
-- SMTP (Email system)  
-- Generative AI APIs  
+- **Frontend/UI:** Streamlit  
+- **Backend:** Python  
+- **Authentication:** Email OTP verification  
+- **API Integration:** User-provided API keys  
 
 ---
 
-## ▶️ How to Run the Project
-
-1. Install dependencies:
-```bash
-pip install streamlit
+## 📂 Project Structure
+<img width="1908" height="1022" alt="image" src="https://github.com/user-attachments/assets/57d44c60-9a48-4c3c-9e33-8e21d3ffba4a" />
