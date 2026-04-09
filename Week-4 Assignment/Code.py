@@ -15,7 +15,7 @@ import requests
 import streamlit as st
 
 
-st.set_page_config(page_title="Prompt Pilot.ai", layout="wide")
+st.set_page_config(page_title="Agent.ai", layout="wide")
 
 
 DEFAULT_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
@@ -141,12 +141,12 @@ def deliver_verification_code(email: str, display_name: str, verification_code: 
 		)
 
 	message = EmailMessage()
-	message["Subject"] = "Prompt Pilot.ai verification code"
+	message["Subject"] = "Agent.ai verification code"
 	message["From"] = mail_from
 	message["To"] = email
 	message.set_content(
 		f"Hello {display_name},\n\n"
-		f"Your Prompt Pilot.ai verification code is: {verification_code}\n"
+		f"Your Agent.ai verification code is: {verification_code}\n"
 		f"This code expires in {VERIFICATION_CODE_TTL_MINUTES} minutes.\n\n"
 		"If you did not request this account, ignore this email."
 	)
@@ -390,6 +390,48 @@ def extract_affordable_tokens(error_text: str) -> int | None:
 	return int(match.group(1))
 
 
+def extract_prompt_token_limits(error_text: str) -> tuple[int, int] | None:
+	match = re.search(
+		r"Prompt tokens limit exceeded:\s*(\d+)\s*>\s*(\d+)",
+		error_text,
+		flags=re.IGNORECASE,
+	)
+	if not match:
+		return None
+	return int(match.group(1)), int(match.group(2))
+
+
+def resolve_response_length_mode(selected_mode: str, user_prompt: str) -> str:
+	if selected_mode != "Auto":
+		return selected_mode
+
+	prompt_text = user_prompt.strip().lower()
+	word_count = len(prompt_text.split())
+	long_cues = [
+		"explain",
+		"in detail",
+		"step by step",
+		"compare",
+		"analysis",
+		"pros and cons",
+		"example",
+		"guide",
+	]
+	short_cues = [
+		"summarize",
+		"short answer",
+		"brief",
+		"one line",
+		"quick",
+	]
+
+	if any(cue in prompt_text for cue in short_cues) or word_count <= 8:
+		return "Short"
+	if any(cue in prompt_text for cue in long_cues) or word_count >= 18:
+		return "Long"
+	return "Medium"
+
+
 def inject_cyberpunk_theme() -> None:
 	st.markdown(
 		"""
@@ -609,6 +651,26 @@ def inject_cyberpunk_theme() -> None:
 			color: var(--text-muted) !important;
 		}
 
+		/* Make toggle labels and switch controls high-contrast and fully visible. */
+		.stToggle label div[data-testid="stMarkdownContainer"] p {
+			color: #243559 !important;
+			opacity: 1 !important;
+			font-weight: 700 !important;
+		}
+
+		.stToggle [data-baseweb="checkbox"] > div {
+			background-color: #d5def8 !important;
+			opacity: 1 !important;
+		}
+
+		.stToggle [data-baseweb="checkbox"] > div[aria-checked="true"] {
+			background-color: #365df5 !important;
+		}
+
+		.stToggle [data-baseweb="checkbox"] > div > div {
+			background-color: #ffffff !important;
+		}
+
 		label,
 		[data-testid="stWidgetLabel"],
 		[data-testid="stWidgetLabel"] p,
@@ -752,7 +814,7 @@ def render_header(model: str, api_key: str) -> None:
 		f"""
 		<div class="cyber-shell">
 			<div class="cyber-eyebrow">Workspace Console</div>
-			<h1 class="cyber-title">Prompt Pilot.ai</h1>
+			<h1 class="cyber-title">Agent.ai</h1>
 			<div class="cyber-subtitle">
 				A clean chat workspace for OpenAI-compatible models with simple account access
 				and organized provider configuration.
@@ -786,8 +848,14 @@ def initialize_state() -> None:
 		st.session_state.temperature_value = 0.7
 	if "max_tokens_value" not in st.session_state:
 		st.session_state.max_tokens_value = 512
+	if "response_length_value" not in st.session_state:
+		st.session_state.response_length_value = "Auto"
+	if "token_saver_mode_value" not in st.session_state:
+		st.session_state.token_saver_mode_value = False
 	if "unlimited_output_value" not in st.session_state:
 		st.session_state.unlimited_output_value = True
+	if "credit_cap_tokens_value" not in st.session_state:
+		st.session_state.credit_cap_tokens_value = 0
 	if "timeout_seconds_value" not in st.session_state:
 		st.session_state.timeout_seconds_value = 60
 	if "use_streaming_value" not in st.session_state:
@@ -825,7 +893,7 @@ def logout_user() -> None:
 	st.session_state.messages = [
 		{
 			"role": "assistant",
-			"content": "Hello. Sign in with a verified email to access Prompt Pilot.ai and start a new session.",
+			"content": "Hello. Sign in with a verified email to access Agent.ai and start a new session.",
 		}
 	]
 
@@ -1085,7 +1153,7 @@ initialize_state()
 inject_cyberpunk_theme()
 
 with st.sidebar:
-	st.markdown("### Prompt Pilot.ai")
+	st.markdown("### Agent.ai")
 	if st.session_state.sidebar_notice:
 		st.success(st.session_state.sidebar_notice)
 		st.session_state.sidebar_notice = ""
@@ -1096,6 +1164,8 @@ with st.sidebar:
 	system_prompt = st.session_state.system_prompt_value
 	temperature = st.session_state.temperature_value
 	max_tokens = st.session_state.max_tokens_value
+	response_length = st.session_state.response_length_value
+	token_saver_mode = st.session_state.token_saver_mode_value
 	unlimited_output = st.session_state.unlimited_output_value
 	timeout_seconds = st.session_state.timeout_seconds_value
 	use_streaming = st.session_state.use_streaming_value
@@ -1159,6 +1229,17 @@ with st.sidebar:
 				system_prompt += " Keep answers short, direct, and actionable."
 			st.session_state.system_prompt_value = system_prompt
 		elif settings_panel == "Generation":
+			response_length = st.selectbox(
+				"Response length",
+				("Auto", "Short", "Medium", "Long"),
+				index=("Auto", "Short", "Medium", "Long").index(st.session_state.response_length_value),
+				help="Controls how detailed responses should be.",
+			)
+			token_saver_mode = st.toggle(
+				"Token saver mode",
+				value=st.session_state.token_saver_mode_value,
+				help="Reduce token usage by sending shorter context and limiting response length.",
+			)
 			temperature = st.slider(
 				"Temperature",
 				min_value=0.0,
@@ -1197,6 +1278,8 @@ with st.sidebar:
 
 	st.session_state.temperature_value = temperature
 	st.session_state.max_tokens_value = max_tokens
+	st.session_state.response_length_value = response_length
+	st.session_state.token_saver_mode_value = token_saver_mode
 	st.session_state.unlimited_output_value = unlimited_output
 	st.session_state.timeout_seconds_value = timeout_seconds
 	st.session_state.use_streaming_value = use_streaming
@@ -1233,7 +1316,7 @@ for message in st.session_state.messages:
 
 chat_disabled = st.session_state.current_user is None
 if chat_disabled:
-	st.info("Log in or create an account from the sidebar to use Prompt Pilot.ai.")
+	st.info("Log in or create an account from the sidebar to use Agent.ai.")
 
 prompt = st.chat_input("Ask anything...", disabled=chat_disabled)
 
@@ -1242,12 +1325,28 @@ if prompt:
 	with st.chat_message("user"):
 		st.markdown(prompt)
 
-	request_messages = [{"role": "system", "content": system_prompt}]
-	request_messages.extend(
+	conversation_messages = [
 		{"role": message["role"], "content": message["content"]}
 		for message in st.session_state.messages
 		if message["role"] in {"user", "assistant"}
-	)
+	]
+	if token_saver_mode:
+		# Keep only recent conversation turns to reduce token usage.
+		conversation_messages = conversation_messages[-6:]
+
+	effective_response_length = resolve_response_length_mode(response_length, prompt)
+
+	length_guidance_map = {
+		"Short": "Respond briefly in about 2-4 sentences.",
+		"Medium": "Respond with a medium-length answer in about 6-10 sentences with useful detail.",
+		"Long": "Respond with a detailed answer in about 10-16 sentences with clear structure.",
+	}
+	effective_system_prompt = (
+		f"{system_prompt} {length_guidance_map.get(effective_response_length, length_guidance_map['Medium'])}"
+	).strip()
+
+	request_messages = [{"role": "system", "content": effective_system_prompt}]
+	request_messages.extend(conversation_messages)
 
 	payload = {
 		"model": model,
@@ -1257,6 +1356,16 @@ if prompt:
 	}
 	if not unlimited_output:
 		payload["max_tokens"] = max_tokens
+	elif st.session_state.credit_cap_tokens_value > 0:
+		payload["max_tokens"] = int(st.session_state.credit_cap_tokens_value)
+
+	if token_saver_mode:
+		token_saver_cap_map = {"Short": 96, "Medium": 240, "Long": 320}
+		token_saver_cap = token_saver_cap_map.get(effective_response_length, 240)
+		if payload.get("max_tokens"):
+			payload["max_tokens"] = min(int(payload["max_tokens"]), token_saver_cap)
+		else:
+			payload["max_tokens"] = token_saver_cap
 
 	reply_text = ""
 	url = build_chat_completions_url(base_url)
@@ -1278,12 +1387,54 @@ if prompt:
 		except requests.HTTPError as exc:
 			status_code = exc.response.status_code if exc.response is not None else None
 			error_body = exc.response.text if exc.response is not None else str(exc)
+			prompt_limit_info = extract_prompt_token_limits(error_body) if status_code == 402 else None
 			affordable_tokens = extract_affordable_tokens(error_body) if status_code == 402 else None
 
-			if affordable_tokens and payload.get("max_tokens") and int(payload.get("max_tokens", 0)) > affordable_tokens:
+			if prompt_limit_info:
+				_, allowed_prompt_tokens = prompt_limit_info
+				latest_user_message = next(
+					(
+						m.get("content", "")
+						for m in reversed(payload.get("messages", []))
+						if isinstance(m, dict) and m.get("role") == "user"
+					),
+					"",
+				)
+				retry_payload = dict(payload)
+				retry_payload["messages"] = [
+					{"role": "user", "content": clean_output_text(latest_user_message)[:80] or "Answer briefly."}
+				]
+				retry_payload["max_tokens"] = min(int(retry_payload.get("max_tokens", 64) or 64), 64)
+				st.session_state.sidebar_notice = (
+					f"Provider prompt-token budget is very low ({allowed_prompt_tokens}). Retrying with minimal context."
+				)
+				try:
+					retry_reply = ""
+					if use_streaming:
+						for chunk in stream_chat_completion(url, headers, retry_payload, timeout_seconds):
+							retry_reply += chunk
+						retry_reply = retry_reply or "No response returned."
+					else:
+						retry_reply = get_non_stream_response(url, headers, retry_payload, timeout_seconds)
+
+					reply_text = clean_output_text(retry_reply)
+					response_placeholder.markdown(reply_text)
+				except requests.HTTPError:
+					reply_text = (
+						"Request failed because provider prompt-token limit is too low for this account right now. "
+						"Try an even shorter prompt or add credits."
+					)
+					response_placeholder.error(reply_text)
+				except requests.RequestException as retry_exc:
+					reply_text = f"Network error after minimal-context retry: {retry_exc}"
+					response_placeholder.error(reply_text)
+			elif affordable_tokens:
 				payload["max_tokens"] = affordable_tokens
 				st.session_state.max_tokens_value = affordable_tokens
-				st.session_state.sidebar_notice = f"Auto-adjusted max_tokens to {affordable_tokens} due to provider credit limits."
+				st.session_state.credit_cap_tokens_value = affordable_tokens
+				st.session_state.sidebar_notice = (
+					f"Auto-adjusted max_tokens to {affordable_tokens} due to provider credit limits."
+				)
 				try:
 					retry_reply = ""
 					if use_streaming:
