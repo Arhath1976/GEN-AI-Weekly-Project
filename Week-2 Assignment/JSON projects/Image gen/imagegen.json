@@ -1,0 +1,14 @@
+{
+  "model": "imagen-3.0-generate-002",
+  "instances": [
+    {
+      "prompt": "A photorealistic black hole in deep space. The black hole has a perfectly dark event horizon at its center, surrounded by a blazing accretion disk of superheated gas glowing in vivid shades of orange, yellow, and white. Gravitational lensing distorts the light and background stars around the event horizon, creating a warped halo effect. The surrounding space is filled with a dense star field and faint nebula clouds in deep blues and purples. The scene is scientifically accurate, inspired by real astrophysics imagery, ultra-high detail, cinematic lighting, 8K resolution."
+    }
+  ],
+  "parameters": {
+    "sampleCount": 1,
+    "aspectRatio": "16:9",
+    "safetyFilterLevel": "block_few",
+    "personGeneration": "dont_allow"
+  }
+}
