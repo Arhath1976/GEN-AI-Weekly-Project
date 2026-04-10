@@ -1,0 +1,14 @@
+{
+  "prompt": "Raw, documentary-style war footage. Soldiers in weathered, mud-caked combat uniforms moving through a destroyed urban battlefield. The video is shot handheld with natural camera shake, motion blur, and lens flare from nearby explosions. Rubble, collapsed buildings, burning vehicles, and craters fill the environment. Thick black smoke rises in the distance. The lighting is harsh, natural daylight filtered through dust and smoke haze. Faces showing real exhaustion and fear. Gritty, raw, no color grading, no cinematic gloss. Looks like real war footage recorded on a professional camera by a combat journalist. No CGI look, no AI artifacts, no clean edges, no fantasy elements. Hyper-realistic, documentary realism, film grain, authentic military equipment and uniforms.",
+  "size": {
+    "width": 1920,
+    "height": 1080
+  },
+  "numVariations": 1,
+  "contentClass": "photo",
+  "styles": {
+    "presets": ["photo"],
+    "renderingSpeed": "standard"
+  },
+  "visualIntensity": 9
+}
