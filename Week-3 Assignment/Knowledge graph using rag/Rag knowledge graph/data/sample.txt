@@ -1,4 +1,0 @@
-ACME builds AI tools for enterprise search.
-ACME acquired BetaLabs in 2024.
-BetaLabs developed a retrieval system for legal research.
-The retrieval system uses embeddings and vector search.
