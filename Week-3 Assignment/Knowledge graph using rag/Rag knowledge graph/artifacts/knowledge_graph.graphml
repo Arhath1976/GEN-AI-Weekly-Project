@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d2" for="edge" attr.name="evidence" attr.type="string" />
+  <key id="d1" for="edge" attr.name="predicate" attr.type="string" />
+  <key id="d0" for="node" attr.name="label" attr.type="string" />
+  <graph edgedefault="directed">
+    <node id="Stellar Pulse Interactive">
+      <data key="d0">Stellar Pulse Interactive</data>
+    </node>
+    <node id="None">
+      <data key="d0">None</data>
+    </node>
+    <node id="Games are not just entertainment—they are experiences that connect players to emotions, stories, and worlds beyond reality.">
+      <data key="d0">Games are not just entertainment—they are experiences that connect players to emotions, stories, and worlds beyond reality.</data>
+    </node>
+    <node id="The studio">
+      <data key="d0">The studio</data>
+    </node>
+    <node id="Unreal Engine 5.3">
+      <data key="d0">Unreal Engine 5.3</data>
+    </node>
+    <node id="Blueprint + system-driven architecture">
+      <data key="d0">Blueprint + system-driven architecture</data>
+    </node>
+    <node id="high-quality third-party and custom assets">
+      <data key="d0">high-quality third-party and custom assets</data>
+    </node>
+    <node id="Alien: The Extinct">
+      <data key="d0">Alien: The Extinct</data>
+    </node>
+    <node id="Untitled Tower FPS Project">
+      <data key="d0">Untitled Tower FPS Project</data>
+    </node>
+    <node id="Echoes of a Shattered Mind">
+      <data key="d0">Echoes of a Shattered Mind</data>
+    </node>
+    <node id="Minimalism, Realism, Psychological Depth, Player Engagement">
+      <data key="d0">Minimalism, Realism, Psychological Depth, Player Engagement</data>
+    </node>
+    <node id="immersive single-player experiences, psychological horror and narrative games, realistic, grounded gameplay, meaningful, story-driven content">
+      <data key="d0">immersive single-player experiences, psychological horror and narrative games, realistic, grounded gameplay, meaningful, story-driven content</data>
+    </node>
+    <node id="release multiple polished indie titles on platforms like Steam, build a recognizable studio identity in the indie space, expand into larger-scale projects with deeper narratives, develop a loyal player community">
+      <data key="d0">release multiple polished indie titles on platforms like Steam, build a recognizable studio identity in the indie space, expand into larger-scale projects with deeper narratives, develop a loyal player community</data>
+    </node>
+    <node id="ACME">
+      <data key="d0">ACME</data>
+    </node>
+    <node id="enterprise search">
+      <data key="d0">enterprise search</data>
+    </node>
+    <node id="BetaLabs">
+      <data key="d0">BetaLabs</data>
+    </node>
+    <node id="legal research">
+      <data key="d0">legal research</data>
+    </node>
+    <node id="The retrieval system">
+      <data key="d0">The retrieval system</data>
+    </node>
+    <node id="embeddings and vector search">
+      <data key="d0">embeddings and vector search</data>
+    </node>
+    <edge source="Stellar Pulse Interactive" target="None" id="0">
+      <data key="d1">is an independent game development studio</data>
+      <data key="d2">The studio blends storytelling, atmosphere, and gameplay innovation to deliver games that leave a lasting psychological and emotional impact on players.</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="None" id="1">
+      <data key="d1">blends storytelling, atmosphere, and gameplay innovation</data>
+      <data key="d2">The studio blends storytelling, atmosphere, and gameplay innovation to deliver games that leave a lasting psychological and emotional impact on players.</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="None" id="2">
+      <data key="d1">aims to push the boundaries of indie game development</data>
+      <data key="d2">Driven by a passion for interactive storytelling, Stellar Pulse Interactive aims to push the boundaries of indie game development by combining high-quality visuals, realistic mechanics, and compelling narratives.</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="None" id="3">
+      <data key="d1">combines high-quality visuals, realistic mechanics, and compelling narratives</data>
+      <data key="d2">Driven by a passion for interactive storytelling, Stellar Pulse Interactive aims to push the boundaries of indie game development by combining high-quality visuals, realistic mechanics, and compelling narratives.</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="None" id="4">
+      <data key="d1">creates games that leave a lasting psychological and emotional impact on players</data>
+      <data key="d2">The studio blends storytelling, atmosphere, and gameplay innovation to deliver games that leave a lasting psychological and emotional impact on players.</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="None" id="5">
+      <data key="d1">creates unforgettable gaming experiences</data>
+      <data key="d2">To create unforgettable gaming experiences that resonate deeply with players—games that are not just played, but felt.</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="None" id="6">
+      <data key="d1">represents the next generation of indie game development</data>
+      <data key="d2">The text</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="None" id="7">
+      <data key="d1">is a vision to create games that stay with you long after you stop playing</data>
+      <data key="d2">The text</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="Games are not just entertainment—they are experiences that connect players to emotions, stories, and worlds beyond reality." id="0">
+      <data key="d1">believes</data>
+      <data key="d2" />
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="Minimalism, Realism, Psychological Depth, Player Engagement" id="0">
+      <data key="d1">follows design philosophy that prioritizes</data>
+      <data key="d2">TEXT: ... Minimalism: Clean UI, maximum immersion...</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="immersive single-player experiences, psychological horror and narrative games, realistic, grounded gameplay, meaningful, story-driven content" id="0">
+      <data key="d1">targets audience who enjoy</data>
+      <data key="d2">TEXT: ... Players who enjoy immersive single-player experiences...</data>
+    </edge>
+    <edge source="Stellar Pulse Interactive" target="release multiple polished indie titles on platforms like Steam, build a recognizable studio identity in the indie space, expand into larger-scale projects with deeper narratives, develop a loyal player community" id="0">
+      <data key="d1">has future goals to</data>
+      <data key="d2">TEXT: ... Release multiple polished indie titles on platforms like Steam...</data>
+    </edge>
+    <edge source="The studio" target="None" id="0">
+      <data key="d1">emphasizes immersion over complexity</data>
+      <data key="d2">Immersion over complexity</data>
+    </edge>
+    <edge source="The studio" target="None" id="1">
+      <data key="d1">emphasizes emotion over spectacle</data>
+      <data key="d2">Emotion over spectacle</data>
+    </edge>
+    <edge source="The studio" target="None" id="2">
+      <data key="d1">emphasizes experience over repetition</data>
+      <data key="d2">Experience over repetition</data>
+    </edge>
+    <edge source="The studio" target="Unreal Engine 5.3" id="0">
+      <data key="d1">uses Unreal Engine 5.3 as game engine</data>
+      <data key="d2">Game Engine: Unreal Engine 5.3</data>
+    </edge>
+    <edge source="The studio" target="Blueprint + system-driven architecture" id="0">
+      <data key="d1">uses Blueprint + system-driven architecture as development style</data>
+      <data key="d2">Development Style: Blueprint + system-driven architecture</data>
+    </edge>
+    <edge source="The studio" target="high-quality third-party and custom assets" id="0">
+      <data key="d1">uses high-quality third-party and custom assets for resources</data>
+      <data key="d2">Assets &amp; Resources: High-quality third-party and custom assets</data>
+    </edge>
+    <edge source="Alien: The Extinct" target="None" id="0">
+      <data key="d1">is a psychological horror experience</data>
+      <data key="d2">A psychological horror experience where the player investigates a mysterious family incident inside a house.</data>
+    </edge>
+    <edge source="Untitled Tower FPS Project" target="None" id="0">
+      <data key="d1">is an intense FPS experience</data>
+      <data key="d2">A grounded, intense FPS experience featuring:...</data>
+    </edge>
+    <edge source="Untitled Tower FPS Project" target="None" id="1">
+      <data key="d1">features a father climbing a tower floor-by-floor</data>
+      <data key="d2">A grounded, intense FPS experience featuring: A father climbing a tower floor-by-floor...</data>
+    </edge>
+    <edge source="Untitled Tower FPS Project" target="None" id="2">
+      <data key="d1">has pistol-focused gameplay</data>
+      <data key="d2">A grounded, intense FPS experience featuring: A single weapon (pistol-focused gameplay)...</data>
+    </edge>
+    <edge source="Echoes of a Shattered Mind" target="None" id="0">
+      <data key="d1">explores corruption</data>
+      <data key="d2">A psychological thriller exploring: Corruption...</data>
+    </edge>
+    <edge source="Echoes of a Shattered Mind" target="None" id="1">
+      <data key="d1">explores the duality of mind</data>
+      <data key="d2">A psychological thriller exploring: Duality of mind...</data>
+    </edge>
+    <edge source="Echoes of a Shattered Mind" target="None" id="2">
+      <data key="d1">explores sanity vs insanity</data>
+      <data key="d2">A psychological thriller exploring: Sanity vs insanity...</data>
+    </edge>
+    <edge source="ACME" target="enterprise search" id="0">
+      <data key="d1">builds AI tools for</data>
+      <data key="d2">None</data>
+    </edge>
+    <edge source="ACME" target="BetaLabs" id="0">
+      <data key="d1">acquired</data>
+      <data key="d2">in 2024</data>
+    </edge>
+    <edge source="BetaLabs" target="legal research" id="0">
+      <data key="d1">developed a retrieval system for</data>
+      <data key="d2">None</data>
+    </edge>
+    <edge source="The retrieval system" target="embeddings and vector search" id="0">
+      <data key="d1">uses</data>
+      <data key="d2">None</data>
+    </edge>
+  </graph>
+</graphml>

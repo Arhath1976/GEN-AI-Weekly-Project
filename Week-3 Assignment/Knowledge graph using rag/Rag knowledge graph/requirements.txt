@@ -1,0 +1,12 @@
+langchain
+langchain-community
+langchain-openai
+langchain-text-splitters
+faiss-cpu
+networkx
+sentence-transformers
+pypdf
+streamlit
+chardet
+langchain-ollama
+langchain-huggingface
