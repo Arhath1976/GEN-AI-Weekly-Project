@@ -1,1 +1,1 @@
-This folder contain(s) all the assignments of week 5.
+These folders contain(s) all the assignments of week 5.
