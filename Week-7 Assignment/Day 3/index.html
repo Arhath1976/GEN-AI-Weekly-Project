@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>SPI Agentic AI</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="background-glow"></div>
+    <div class="chat-blur-overlay" id="chatBlurOverlay" onclick="closeOverview()"></div>
+
+    <main class="app-shell" id="appShell">
+        <section class="chat-card">
+            <header class="top-bar">
+                <div class="brand-block">
+                    <div class="brand-logo">SPI</div>
+
+                    <div>
+                        <h1>SPI Agentic AI</h1>
+                        <p>Local AutoGen assistant with tools and live backend overview</p>
+                    </div>
+                </div>
+
+                <div class="status-pill">
+                    <span class="pulse-dot"></span>
+                    Local Port Active
+                </div>
+            </header>
+
+            <section class="hero-strip">
+                <div>
+                    <span class="eyebrow">Agent Mode</span>
+                    <h2>Ask, plan, calculate, use tools, and inspect AutoGen internals.</h2>
+                </div>
+
+                <button class="ghost-btn" onclick="resetChat()">Reset</button>
+            </section>
+
+            <section class="chat-container" id="chatContainer">
+                <div class="message assistant">
+                    <div class="message-label">SPI Agent</div>
+                    <div class="message-text">
+                        Hello! I am your local AutoGen agent. Ask me something like: "What is the weather in Chennai?" or "Calculate 25 * 99".
+                    </div>
+                </div>
+            </section>
+
+            <section class="input-dock">
+                <button class="overview-btn" onclick="openOverview()">
+                    <span>Overview</span>
+                </button>
+
+                <input
+                    id="userInput"
+                    class="input-box"
+                    type="text"
+                    placeholder="Ask SPI Agent something..."
+                    autocomplete="off"
+                    onkeydown="handleKey(event)"
+                >
+
+                <button id="sendBtn" class="send-btn" onclick="sendMessage()">
+                    Send
+                </button>
+            </section>
+        </section>
+    </main>
+
+    <aside class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <div>
+                <h2>Backend Overview</h2>
+                <p>AutoGen internal run details</p>
+            </div>
+
+            <button class="close-btn" onclick="closeOverview()">×</button>
+        </div>
+
+        <div class="panel-content" id="overviewContent">
+            <p class="small-text">No backend data yet.</p>
+        </div>
+    </aside>
+
+    <script>
+        const chatContainer = document.getElementById("chatContainer");
+        const userInput = document.getElementById("userInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const sidePanel = document.getElementById("sidePanel");
+        const overviewContent = document.getElementById("overviewContent");
+        const chatBlurOverlay = document.getElementById("chatBlurOverlay");
+
+        let latestOverview = null;
+        let latestAutoGenMessages = [];
+        let latestRunSummary = null;
+
+        function openOverview() {
+            sidePanel.classList.add("open");
+            chatBlurOverlay.classList.add("show");
+            document.body.classList.add("overview-open");
+            loadOverview();
+        }
+
+        function closeOverview() {
+            sidePanel.classList.remove("open");
+            chatBlurOverlay.classList.remove("show");
+            document.body.classList.remove("overview-open");
+        }
+
+        function handleKey(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
+        function scrollToLatestMessage() {
+            requestAnimationFrame(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            });
+
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 80);
+
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 250);
+        }
+
+        function addMessage(role, content) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "message " + role;
+
+            const label = document.createElement("div");
+            label.className = "message-label";
+            label.textContent = role === "user" ? "You" : "SPI Agent";
+
+            const text = document.createElement("div");
+            text.className = "message-text";
+            text.textContent = content;
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(text);
+
+            chatContainer.appendChild(wrapper);
+            scrollToLatestMessage();
+
+            return text;
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+
+            if (!message) return;
+
+            addMessage("user", message);
+            userInput.value = "";
+
+            sendBtn.disabled = true;
+            sendBtn.textContent = "Thinking...";
+
+            const typingText = addMessage("assistant", "Thinking...");
+
+            try {
+                const response = await fetch("/chat", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+
+                typingText.textContent = data.reply || "No response.";
+                scrollToLatestMessage();
+
+                latestOverview = data.overview;
+                latestAutoGenMessages = data.autogen_messages || [];
+                latestRunSummary = data.run_summary || null;
+
+                renderOverview(latestOverview);
+
+            } catch (error) {
+                typingText.textContent = "Frontend error: " + error.message;
+                scrollToLatestMessage();
+            }
+
+            sendBtn.disabled = false;
+            sendBtn.textContent = "Send";
+            userInput.focus();
+        }
+
+        async function loadOverview() {
+            try {
+                const response = await fetch("/overview");
+                const data = await response.json();
+
+                latestOverview = data;
+                renderOverview(data);
+
+            } catch (error) {
+                overviewContent.innerHTML = `
+                    <p class="small-text">Could not load overview: ${escapeHtml(error.message)}</p>
+                `;
+            }
+        }
+
+        async function resetChat() {
+            try {
+                await fetch("/reset", {
+                    method: "POST"
+                });
+
+                chatContainer.innerHTML = "";
+
+                addMessage(
+                    "assistant",
+                    "Chat reset complete. I am ready again."
+                );
+
+                latestAutoGenMessages = [];
+                latestRunSummary = null;
+
+                loadOverview();
+
+            } catch (error) {
+                addMessage("assistant", "Reset error: " + error.message);
+            }
+        }
+
+        function renderOverview(data) {
+            if (!data) {
+                overviewContent.innerHTML = `<p class="small-text">No backend data yet.</p>`;
+                return;
+            }
+
+            const stats = data.stats || {};
+            const chatHistory = data.chat_history || [];
+            const backendEvents = data.backend_events || [];
+
+            let html = "";
+
+            html += `
+                <div class="overview-card premium-card">
+                    <div class="card-title-row">
+                        <h3>System</h3>
+                        <span class="mini-pill">${escapeHtml(stats.status || "unknown")}</span>
+                    </div>
+
+                    <div class="data-row"><span>App</span><strong>${escapeHtml(stats.app_name || "-")}</strong></div>
+                    <div class="data-row"><span>Started</span><strong>${escapeHtml(stats.started_at || "-")}</strong></div>
+                    <div class="data-row"><span>Model</span><strong>${escapeHtml(stats.model || "-")}</strong></div>
+                    <div class="data-row"><span>Temperature</span><strong>${stats.temperature}</strong></div>
+                </div>
+            `;
+
+            html += `
+                <div class="overview-card">
+                    <h3>AutoGen Run Summary</h3>
+
+                    <div class="data-grid">
+                        <div>
+                            <span>Inner Messages</span>
+                            <strong>${stats.last_inner_messages || 0}</strong>
+                        </div>
+
+                        <div>
+                            <span>Prompt Tokens</span>
+                            <strong>${stats.last_prompt_tokens || 0}</strong>
+                        </div>
+
+                        <div>
+                            <span>Completion Tokens</span>
+                            <strong>${stats.last_completion_tokens || 0}</strong>
+                        </div>
+
+                        <div>
+                            <span>Duration</span>
+                            <strong>${stats.last_response_time_seconds || 0}s</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <h3>Usage</h3>
+
+                    <div class="data-grid">
+                        <div>
+                            <span>Total Requests</span>
+                            <strong>${stats.total_requests || 0}</strong>
+                        </div>
+
+                        <div>
+                            <span>Tool Calls</span>
+                            <strong>${stats.total_tool_calls || 0}</strong>
+                        </div>
+
+                        <div>
+                            <span>Last Total Tokens</span>
+                            <strong>${stats.last_total_tokens || 0}</strong>
+                        </div>
+
+                        <div>
+                            <span>Est. All Tokens</span>
+                            <strong>${stats.estimated_total_tokens || 0}</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            html += `
+                <div class="overview-card">
+                    <h3>AutoGen Messages</h3>
+                    <p class="small-text">Latest internal messages from the last run.</p>
+            `;
+
+            if (latestAutoGenMessages.length === 0) {
+                html += `<p class="small-text">No AutoGen messages captured yet.</p>`;
+            }
+
+            latestAutoGenMessages.forEach((msg, index) => {
+                html += `
+                    <div class="event autogen-event">
+                        <div class="event-top">
+                            <span class="event-type">${index + 1}. ${escapeHtml(msg.type || "")}</span>
+                            <span class="event-time">${escapeHtml(msg.source || "")}</span>
+                        </div>
+
+                        <div class="event-content">
+                            <b>Category:</b> ${escapeHtml(msg.category || "unknown")}
+                        </div>
+
+                        <div class="event-content">
+                            <b>Prompt tokens:</b> ${msg.prompt_tokens || 0}
+                            &nbsp; | &nbsp;
+                            <b>Completion tokens:</b> ${msg.completion_tokens || 0}
+                        </div>
+
+                        <pre class="code-event">${escapeHtml(msg.content || "").slice(0, 1200)}</pre>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            html += `
+                <div class="overview-card">
+                    <h3>Chat Data</h3>
+                    <p class="small-text">Recent messages: ${chatHistory.length}</p>
+            `;
+
+            chatHistory.slice(-8).forEach(msg => {
+                html += `
+                    <div class="event">
+                        <div class="event-top">
+                            <span class="event-type">${escapeHtml(msg.role)}</span>
+                            <span class="event-time">${escapeHtml(msg.time)}</span>
+                        </div>
+
+                        <div class="event-content">${escapeHtml(msg.content).slice(0, 300)}</div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            html += `
+                <div class="overview-card">
+                    <h3>Backend Events</h3>
+                    <p class="small-text">Tool calls, tool results, and internal events.</p>
+            `;
+
+            backendEvents.slice().reverse().slice(0, 30).forEach(event => {
+                html += `
+                    <div class="event">
+                        <div class="event-top">
+                            <span class="event-type">${escapeHtml(event.type || "")}</span>
+                            <span class="event-time">${escapeHtml(event.time || "")}</span>
+                        </div>
+
+                        ${event.tool ? `<div class="event-content"><b>Tool:</b> ${escapeHtml(event.tool)}</div>` : ""}
+                        ${event.input ? `<div class="event-content"><b>Input:</b> ${escapeHtml(event.input).slice(0, 220)}</div>` : ""}
+                        ${event.output ? `<div class="event-content"><b>Output:</b> ${escapeHtml(event.output).slice(0, 220)}</div>` : ""}
+                        ${event.content ? `<pre class="code-event">${escapeHtml(event.content).slice(0, 900)}</pre>` : ""}
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            html += `
+                <div class="overview-card note-card">
+                    <h3>Token Note</h3>
+                    <p class="small-text">
+                        Prompt/completion tokens are captured from AutoGen message usage when available.
+                        Estimated tokens are calculated from character count.
+                    </p>
+                </div>
+            `;
+
+            overviewContent.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+
+            return String(text)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        loadOverview();
+        userInput.focus();
+        scrollToLatestMessage();
+    </script>
+</body>
+</html>
