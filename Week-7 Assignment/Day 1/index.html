@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LiveKit Voice Agent Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101014;
+      color: white;
+      text-align: center;
+      padding-top: 45px;
+    }
+
+    h1 {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #aaa;
+      margin-bottom: 25px;
+    }
+
+    button {
+      padding: 14px 24px;
+      font-size: 17px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      background: #4f46e5;
+      color: white;
+      margin: 8px;
+    }
+
+    button:hover:not(:disabled) {
+      background: #6366f1;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #micBtn.off {
+      background: #dc2626;
+    }
+
+    #micBtn.on {
+      background: #16a34a;
+    }
+
+    input {
+      width: 430px;
+      max-width: 90%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 18px;
+      margin-top: 20px;
+      outline: none;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #ddd;
+    }
+
+    .meter-wrap {
+      width: 430px;
+      max-width: 90%;
+      height: 22px;
+      background: #252532;
+      margin: 18px auto 5px auto;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    #meter {
+      height: 100%;
+      width: 0%;
+      background: #22c55e;
+      transition: width 0.08s linear;
+    }
+
+    #micText {
+      color: #aaa;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    #log {
+      margin: 25px auto;
+      max-width: 920px;
+      text-align: left;
+      background: #18181f;
+      padding: 15px;
+      border-radius: 10px;
+      color: #aaa;
+      font-size: 14px;
+      white-space: pre-wrap;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    audio {
+      margin-top: 12px;
+      width: 430px;
+      max-width: 90%;
+    }
+  </style>
+</head>
+<body>
+  <h1>LiveKit Voice Agent Test</h1>
+  <p class="subtitle">Text + Voice AI Agent</p>
+
+  <button id="joinBtn">Join Room</button>
+  <button id="leaveBtn" disabled>Leave Room</button>
+  <button id="micBtn" class="off" disabled>Mic OFF</button>
+
+  <br>
+
+  <input id="textInput" placeholder="Type: hello" disabled />
+  <button id="sendBtn" disabled>Send to AI</button>
+
+  <p id="status">Not connected</p>
+
+  <div class="meter-wrap">
+    <div id="meter"></div>
+  </div>
+  <p id="micText">Mic level: 0%</p>
+
+  <div id="log"></div>
+
+  <script type="module">
+    import {
+      Room,
+      RoomEvent,
+      createLocalAudioTrack
+    } from "https://cdn.jsdelivr.net/npm/livekit-client@2.15.13/dist/livekit-client.esm.mjs";
+
+    let room = null;
+    let micTrack = null;
+    let micEnabled = false;
+
+    let audioContext = null;
+    let analyser = null;
+    let source = null;
+    let meterTimer = null;
+
+    const joinBtn = document.getElementById("joinBtn");
+    const leaveBtn = document.getElementById("leaveBtn");
+    const micBtn = document.getElementById("micBtn");
+    const sendBtn = document.getElementById("sendBtn");
+    const textInput = document.getElementById("textInput");
+    const statusEl = document.getElementById("status");
+    const logEl = document.getElementById("log");
+    const meterEl = document.getElementById("meter");
+    const micText = document.getElementById("micText");
+
+    function log(message) {
+      console.log(message);
+      logEl.textContent += message + "\n";
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function setMicButtonState() {
+      if (micEnabled) {
+        micBtn.textContent = "Mic ON";
+        micBtn.classList.remove("off");
+        micBtn.classList.add("on");
+      } else {
+        micBtn.textContent = "Mic OFF";
+        micBtn.classList.remove("on");
+        micBtn.classList.add("off");
+      }
+    }
+
+    async function startMicMeter(mediaStreamTrack) {
+      stopMicMeter();
+
+      const stream = new MediaStream([mediaStreamTrack]);
+
+      audioContext = new AudioContext();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+
+      source = audioContext.createMediaStreamSource(stream);
+      source.connect(analyser);
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+      meterTimer = setInterval(() => {
+        analyser.getByteFrequencyData(dataArray);
+
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+
+        const avg = sum / dataArray.length;
+        const percent = Math.min(100, Math.round((avg / 128) * 100));
+
+        meterEl.style.width = percent + "%";
+        micText.textContent = "Mic level: " + percent + "%";
+      }, 100);
+    }
+
+    async function stopMicMeter() {
+      if (meterTimer) {
+        clearInterval(meterTimer);
+        meterTimer = null;
+      }
+
+      if (source) {
+        try {
+          source.disconnect();
+        } catch (e) {}
+        source = null;
+      }
+
+      if (audioContext) {
+        try {
+          await audioContext.close();
+        } catch (e) {}
+        audioContext = null;
+      }
+
+      meterEl.style.width = "0%";
+      micText.textContent = "Mic level: 0%";
+    }
+
+    async function enableMic() {
+      if (!room || room.state !== "connected") {
+        log("Cannot enable mic. Room is not connected.");
+        return;
+      }
+
+      try {
+        statusEl.textContent = "Requesting microphone permission...";
+        log("Requesting microphone permission...");
+
+        micTrack = await createLocalAudioTrack({
+          echoCancellation: true,
+          noiseSuppression: false,
+          autoGainControl: true,
+        });
+
+        await room.localParticipant.publishTrack(micTrack);
+
+        micEnabled = true;
+        setMicButtonState();
+
+        const mediaStreamTrack = micTrack.mediaStreamTrack;
+        log("Microphone published.");
+        log("Mic label: " + mediaStreamTrack.label);
+        log("Mic enabled: " + mediaStreamTrack.enabled);
+        log("Mic muted: " + mediaStreamTrack.muted);
+        log("Mic readyState: " + mediaStreamTrack.readyState);
+
+        await startMicMeter(mediaStreamTrack);
+
+        statusEl.textContent = "Mic ON. Speak or type a message.";
+
+      } catch (error) {
+        micEnabled = false;
+        setMicButtonState();
+
+        log("Mic error: " + error.message);
+        statusEl.textContent = "Mic failed. Text input still works.";
+      }
+    }
+
+    async function disableMic() {
+      try {
+        if (micTrack) {
+          try {
+            await room.localParticipant.unpublishTrack(micTrack);
+          } catch (e) {}
+
+          micTrack.stop();
+          micTrack = null;
+        }
+
+        await stopMicMeter();
+
+        micEnabled = false;
+        setMicButtonState();
+
+        statusEl.textContent = "Mic OFF. Text input still works.";
+        log("Microphone turned off.");
+
+      } catch (error) {
+        log("Mic disable error: " + error.message);
+      }
+    }
+
+    async function toggleMic() {
+      if (micEnabled) {
+        await disableMic();
+      } else {
+        await enableMic();
+      }
+    }
+
+    async function joinRoom() {
+      try {
+        joinBtn.disabled = true;
+        statusEl.textContent = "Getting token...";
+        log("Getting token...");
+
+        const response = await fetch("/token?room=test-room&identity=user-" + Date.now());
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        log("Token received.");
+        log("LiveKit URL: " + data.url);
+
+        room = new Room({
+          adaptiveStream: true,
+          dynacast: true,
+        });
+
+        room.on(RoomEvent.Connected, () => {
+          statusEl.textContent = "Connected. Type a message or turn on mic.";
+          log("Connected to LiveKit.");
+
+          leaveBtn.disabled = false;
+          micBtn.disabled = false;
+          sendBtn.disabled = false;
+          textInput.disabled = false;
+          textInput.focus();
+        });
+
+        room.on(RoomEvent.Disconnected, (reason) => {
+          statusEl.textContent = "Disconnected.";
+          log("Disconnected. Reason: " + reason);
+
+          joinBtn.disabled = false;
+          leaveBtn.disabled = true;
+          micBtn.disabled = true;
+          sendBtn.disabled = true;
+          textInput.disabled = true;
+
+          micEnabled = false;
+          setMicButtonState();
+          stopMicMeter();
+        });
+
+        room.on(RoomEvent.ConnectionStateChanged, (state) => {
+          log("Connection state: " + state);
+        });
+
+        room.on(RoomEvent.ParticipantConnected, (participant) => {
+          log("Participant connected: " + participant.identity);
+        });
+
+        room.on(RoomEvent.ParticipantDisconnected, (participant) => {
+          log("Participant disconnected: " + participant.identity);
+        });
+
+        room.on(RoomEvent.LocalTrackPublished, (publication) => {
+          log("Local track published: " + publication.kind);
+        });
+
+        room.on(RoomEvent.LocalTrackUnpublished, (publication) => {
+          log("Local track unpublished: " + publication.kind);
+        });
+
+        room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+          log("Track subscribed from: " + participant.identity + " | kind: " + track.kind);
+
+          if (track.kind === "audio") {
+            const audioElement = track.attach();
+            audioElement.autoplay = true;
+            audioElement.controls = true;
+            document.body.appendChild(audioElement);
+
+            audioElement.play().catch((err) => {
+              log("Audio play blocked. Click the audio player. " + err.message);
+            });
+
+            log("Agent audio attached.");
+          }
+        });
+
+        await room.connect(data.url, data.token);
+        log("Room connect call completed.");
+
+      } catch (error) {
+        log("ERROR: " + error.message);
+        statusEl.textContent = "Error: " + error.message;
+        joinBtn.disabled = false;
+      }
+    }
+
+    async function sendText() {
+      const text = textInput.value.trim();
+
+      if (!text) {
+        log("Text box is empty.");
+        return;
+      }
+
+      if (!room) {
+        log("Room object missing.");
+        return;
+      }
+
+      if (room.state !== "connected") {
+        log("Room not connected. Current state: " + room.state);
+        return;
+      }
+
+      try {
+        const encoder = new TextEncoder();
+
+        await room.localParticipant.publishData(
+          encoder.encode(text),
+          {
+            reliable: true,
+            topic: "chat"
+          }
+        );
+
+        log("You typed: " + text);
+        log("Data message sent to agent.");
+
+        textInput.value = "";
+        textInput.focus();
+
+      } catch (error) {
+        log("Failed to send data message: " + error.message);
+        console.error(error);
+      }
+    }
+
+    async function leaveRoom() {
+      await disableMic();
+
+      if (room) {
+        await room.disconnect();
+        room = null;
+      }
+
+      statusEl.textContent = "Disconnected.";
+      joinBtn.disabled = false;
+      leaveBtn.disabled = true;
+      micBtn.disabled = true;
+      sendBtn.disabled = true;
+      textInput.disabled = true;
+
+      micEnabled = false;
+      setMicButtonState();
+
+      log("Left room.");
+    }
+
+    joinBtn.addEventListener("click", joinRoom);
+    leaveBtn.addEventListener("click", leaveRoom);
+    micBtn.addEventListener("click", toggleMic);
+    sendBtn.addEventListener("click", sendText);
+
+    textInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        sendText();
+      }
+    });
+
+    setMicButtonState();
+  </script>
+</body>
+</html>
