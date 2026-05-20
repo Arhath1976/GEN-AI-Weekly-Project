@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPI Agentic AI Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="background-glow"></div>
+  <div class="chat-blur-overlay" id="blurOverlay"></div>
+
+  <main class="dashboard-shell">
+    <aside class="sidebar">
+      <div class="side-brand">
+        <div class="brand-logo">SPI</div>
+        <div>
+          <h1>Agentic AI</h1>
+          <p>Stellar Pulse Interactive</p>
+        </div>
+      </div>
+
+      <button class="nav-btn active" data-agent="home">Home Agent</button>
+      <button class="nav-btn" data-agent="interviewer">AI Interviewer</button>
+      <button class="nav-btn" data-agent="stock">Stock Analyzer</button>
+      <button class="nav-btn" data-agent="gamedev">Game Dev Agent</button>
+      <button class="nav-btn" data-agent="website">Website Builder</button>
+      <button class="nav-btn" data-agent="email">Email Automation</button>
+      <button class="nav-btn" data-agent="research">Research Agent</button>
+      <button class="nav-btn" data-agent="reviewer">Code Reviewer</button>
+      <button class="nav-btn voice-nav" data-agent="voice">Voice Agent</button>
+
+      <div class="sidebar-footer">
+        <button class="overview-btn full" id="overviewBtn">Overview</button>
+        <button class="ghost-btn full" id="resetBtn">Reset</button>
+      </div>
+    </aside>
+
+    <section class="main-card">
+      <header class="top-bar">
+        <div>
+          <span class="eyebrow">Selected Agent</span>
+          <h2 id="pageTitle">Home Agent</h2>
+          <p id="pagePurpose">General agentic AI assistant for explanations, planning, coding, tools, and project help.</p>
+        </div>
+        <div class="status-pill"><span class="pulse-dot"></span> Online</div>
+      </header>
+
+      <section class="hero-grid" id="heroGrid">
+        <div class="hero-card">
+          <span class="eyebrow">Multi-Team Flow</span>
+          <h3>Planning → Tools → Review</h3>
+          <p>Every chat runs through AutoGen teams and the Overview panel shows what each team worked on.</p>
+        </div>
+        <div class="hero-card">
+          <span class="eyebrow">Voice Ready</span>
+          <h3>LiveKit Voice Page</h3>
+          <p>Use the Voice Agent page after running your LiveKit worker in another PowerShell terminal.</p>
+        </div>
+      </section>
+
+      <section class="voice-panel hidden" id="voicePanel">
+        <div class="voice-orb" id="voiceOrb">AI</div>
+        <h3>LiveKit Voice Agent</h3>
+        <p>Connect to a LiveKit room, toggle mic, and speak with your AI voice worker.</p>
+        <div class="voice-actions">
+          <button class="send-btn" id="connectVoiceBtn">Connect Voice</button>
+          <button class="ghost-btn" id="micBtn" disabled>Mic Off</button>
+          <button class="ghost-btn" id="disconnectVoiceBtn" disabled>Disconnect</button>
+        </div>
+        <pre class="voice-log" id="voiceLog">Voice status: idle</pre>
+      </section>
+
+      <section class="chat-container" id="chatContainer">
+        <div class="message assistant">
+          <div class="message-label">Assistant</div>
+          <div class="message-text">Welcome! Choose an agent from the sidebar and start chatting.</div>
+        </div>
+      </section>
+
+      <form class="input-dock" id="chatForm">
+        <input class="input-box" id="messageInput" placeholder="Ask the selected agent..." autocomplete="off" />
+        <button class="send-btn" id="sendBtn" type="submit">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <aside class="side-panel" id="overviewPanel">
+    <div class="panel-header">
+      <div>
+        <h2>Backend Overview</h2>
+        <p>Teams, tools, token usage, state, and events.</p>
+      </div>
+      <button class="close-btn" id="closeOverview">×</button>
+    </div>
+    <div class="panel-content" id="overviewContent"></div>
+  </aside>
+
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
+  <script>
+    const chatContainer = document.getElementById("chatContainer");
+    const chatForm = document.getElementById("chatForm");
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const overviewBtn = document.getElementById("overviewBtn");
+    const closeOverview = document.getElementById("closeOverview");
+    const overviewPanel = document.getElementById("overviewPanel");
+    const overviewContent = document.getElementById("overviewContent");
+    const blurOverlay = document.getElementById("blurOverlay");
+    const pageTitle = document.getElementById("pageTitle");
+    const pagePurpose = document.getElementById("pagePurpose");
+    const voicePanel = document.getElementById("voicePanel");
+    const heroGrid = document.getElementById("heroGrid");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const connectVoiceBtn = document.getElementById("connectVoiceBtn");
+    const micBtn = document.getElementById("micBtn");
+    const disconnectVoiceBtn = document.getElementById("disconnectVoiceBtn");
+    const voiceLog = document.getElementById("voiceLog");
+    const voiceOrb = document.getElementById("voiceOrb");
+
+    let selectedAgent = "home";
+    let agents = {};
+    let livekitRoom = null;
+    let micEnabled = false;
+
+    async function loadAgents() {
+      const res = await fetch("/agents");
+      agents = await res.json();
+    }
+
+    function setAgent(agentType) {
+      selectedAgent = agentType;
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.agent === agentType));
+      const page = agents[agentType] || agents.home;
+      pageTitle.textContent = page.title;
+      pagePurpose.textContent = page.purpose;
+      const isVoice = agentType === "voice";
+      voicePanel.classList.toggle("hidden", !isVoice);
+      heroGrid.classList.toggle("hidden", isVoice);
+      chatForm.classList.toggle("hidden", isVoice);
+      chatContainer.classList.toggle("hidden", isVoice);
+    }
+
+    function addMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = `message ${role}`;
+      div.innerHTML = `<div class="message-label">${role === "user" ? "You" : "Assistant"}</div><div class="message-text"></div>`;
+      div.querySelector(".message-text").textContent = text;
+      chatContainer.appendChild(div);
+      requestAnimationFrame(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      });
+    }
+
+    async function sendMessage(message) {
+      addMessage("user", message);
+      sendBtn.disabled = true;
+      messageInput.value = "";
+      addMessage("assistant", "Thinking through teams...");
+      const thinking = chatContainer.lastElementChild.querySelector(".message-text");
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({message, agent_type: selectedAgent})
+        });
+        const data = await res.json();
+        thinking.textContent = data.reply || "No response.";
+        renderOverview(data.overview);
+      } catch (err) {
+        thinking.textContent = "Frontend error: " + err.message;
+      } finally {
+        sendBtn.disabled = false;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    }
+
+    chatForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const msg = messageInput.value.trim();
+      if (msg) sendMessage(msg);
+    });
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => setAgent(btn.dataset.agent));
+    });
+
+    function openOverview() {
+      document.body.classList.add("overview-open");
+      overviewPanel.classList.add("open");
+      blurOverlay.classList.add("show");
+      fetchOverview();
+    }
+
+    function closePanel() {
+      document.body.classList.remove("overview-open");
+      overviewPanel.classList.remove("open");
+      blurOverlay.classList.remove("show");
+    }
+
+    overviewBtn.addEventListener("click", openOverview);
+    closeOverview.addEventListener("click", closePanel);
+    blurOverlay.addEventListener("click", closePanel);
+
+    async function fetchOverview() {
+      const res = await fetch("/overview");
+      const data = await res.json();
+      renderOverview(data);
+    }
+
+    function escapeHtml(text) {
+      return String(text ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    }
+
+    function renderOverview(data) {
+      if (!data) return;
+      const stats = data.stats || {};
+      const teams = data.teams_overview || [];
+      const runs = data.team_runs || [];
+      const events = data.backend_events || [];
+
+      overviewContent.innerHTML = `
+        <div class="overview-card premium-card">
+          <h3>System Stats</h3>
+          <div class="data-grid">
+            <div><span>Requests</span><strong>${stats.total_requests || 0}</strong></div>
+            <div><span>Tool Calls</span><strong>${stats.total_tool_calls || 0}</strong></div>
+            <div><span>Team Runs</span><strong>${stats.total_team_runs || 0}</strong></div>
+            <div><span>Voice</span><strong>${stats.voice_enabled ? "Ready" : "Missing"}</strong></div>
+          </div>
+          <div class="data-row"><span>Model</span><strong>${escapeHtml(stats.model)}</strong></div>
+          <div class="data-row"><span>Last Agent</span><strong>${escapeHtml(stats.last_agent_type)}</strong></div>
+          <div class="data-row"><span>Last Time</span><strong>${stats.last_response_time_seconds || 0}s</strong></div>
+          <div class="data-row"><span>Last Tokens</span><strong>${stats.last_total_tokens || 0}</strong></div>
+        </div>
+
+        <div class="overview-card">
+          <h3>Team Flow</h3>
+          ${(stats.last_team_flow || []).map(f => `
+            <div class="event autogen-event">
+              <div class="event-top"><span class="event-type">Step ${f.step}: ${escapeHtml(f.team)}</span></div>
+              <div class="event-content">${escapeHtml(f.work)}</div>
+            </div>`).join("") || `<p class="small-text">No team flow yet.</p>`}
+        </div>
+
+        <div class="overview-card">
+          <h3>Teams</h3>
+          ${teams.map(t => `
+            <div class="event">
+              <div class="event-top"><span class="event-type">${escapeHtml(t.team_name)}</span><span class="mini-pill">${escapeHtml(t.status)}</span></div>
+              <div class="event-content">${escapeHtml(t.purpose)}</div>
+              <pre class="code-event">Working with: ${(t.works_with || []).join(", ")}
+Last work: ${escapeHtml(t.last_work)}
+Agents: ${(t.agents || []).map(a => a.name).join(", ")}</pre>
+            </div>`).join("")}
+        </div>
+
+        <div class="overview-card">
+          <h3>Recent Team Runs</h3>
+          ${runs.slice().reverse().map(r => `
+            <div class="event autogen-event">
+              <div class="event-top"><span class="event-type">${escapeHtml(r.team_name)}</span><span class="event-time">${escapeHtml(r.time)}</span></div>
+              <div class="event-content">Messages: ${r.messages_count} | Tokens: ${r.total_tokens} | Duration: ${r.duration_seconds}s</div>
+            </div>`).join("") || `<p class="small-text">No team runs yet.</p>`}
+        </div>
+
+        <div class="overview-card">
+          <h3>Backend Events</h3>
+          ${events.slice().reverse().slice(0, 30).map(e => `
+            <div class="event">
+              <div class="event-top"><span class="event-type">${escapeHtml(e.type)}</span><span class="event-time">${escapeHtml(e.time)}</span></div>
+              <div class="event-content">${escapeHtml(e.team || e.agent || e.tool || "")}</div>
+              <pre class="code-event">${escapeHtml(e.content || e.output || e.input || "")}</pre>
+            </div>`).join("") || `<p class="small-text">No events yet.</p>`}
+        </div>
+      `;
+    }
+
+    resetBtn.addEventListener("click", async () => {
+      await fetch("/reset", {method: "POST"});
+      chatContainer.innerHTML = "";
+      addMessage("assistant", "Reset done. Choose an agent and start again.");
+      fetchOverview();
+    });
+
+    function logVoice(text) {
+      voiceLog.textContent += "\n" + text;
+      voiceLog.scrollTop = voiceLog.scrollHeight;
+    }
+
+    connectVoiceBtn.addEventListener("click", async () => {
+      try {
+        logVoice("Requesting LiveKit token...");
+        const tokenRes = await fetch("/voice/token", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({})
+        });
+        const data = await tokenRes.json();
+        if (!tokenRes.ok) {
+          logVoice("Error: " + (data.error || "Token failed"));
+          return;
+        }
+
+        livekitRoom = new LivekitClient.Room();
+        livekitRoom.on(LivekitClient.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+          if (track.kind === "audio") {
+            const el = track.attach();
+            document.body.appendChild(el);
+            logVoice("AI audio subscribed: " + participant.identity);
+          }
+        });
+
+        await livekitRoom.connect(data.url, data.token);
+        logVoice("Connected to room: " + data.room);
+        voiceOrb.classList.add("listening");
+        connectVoiceBtn.disabled = true;
+        micBtn.disabled = false;
+        disconnectVoiceBtn.disabled = false;
+      } catch (err) {
+        logVoice("Voice error: " + err.message);
+      }
+    });
+
+    micBtn.addEventListener("click", async () => {
+      if (!livekitRoom) return;
+      micEnabled = !micEnabled;
+      await livekitRoom.localParticipant.setMicrophoneEnabled(micEnabled);
+      micBtn.textContent = micEnabled ? "Mic On" : "Mic Off";
+      voiceOrb.classList.toggle("speaking", micEnabled);
+      logVoice(micEnabled ? "Microphone enabled." : "Microphone disabled.");
+    });
+
+    disconnectVoiceBtn.addEventListener("click", async () => {
+      if (livekitRoom) {
+        await livekitRoom.disconnect();
+        livekitRoom = null;
+      }
+      micEnabled = false;
+      connectVoiceBtn.disabled = false;
+      micBtn.disabled = true;
+      disconnectVoiceBtn.disabled = true;
+      micBtn.textContent = "Mic Off";
+      voiceOrb.classList.remove("listening", "speaking");
+      logVoice("Disconnected.");
+    });
+
+    (async () => {
+      await loadAgents();
+      setAgent("home");
+      fetchOverview();
+    })();
+  </script>
+</body>
+</html>
