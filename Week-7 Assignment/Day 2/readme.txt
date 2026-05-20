@@ -1,0 +1,1 @@
+A simple ai chatbot,using autogen and openai.You can talk with it insde the vs code terminal.
