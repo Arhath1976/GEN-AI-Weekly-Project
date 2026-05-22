@@ -1,0 +1,105 @@
+﻿A2A STANDALONE APP GUIDE
+========================
+
+Project Name:
+A2A Standalone Agent Communication App
+
+Python Version:
+Python 3.11.0
+
+--------------------------------------------------
+1. DESCRIPTION
+--------------------------------------------------
+
+This project is a standalone web app that demonstrates A2A, which means Agent-to-Agent communication.
+
+The browser acts as ClientAgent.
+The FastAPI backend acts as ServerAgent.
+
+The user sends a message from the web app.
+The frontend sends the message to the backend using JavaScript fetch.
+The backend receives the message at the /message endpoint.
+The ServerAgent processes the message and returns a JSON reply.
+The frontend displays the reply inside the app UI.
+
+--------------------------------------------------
+2. TECHNOLOGIES USED
+--------------------------------------------------
+
+Python 3.11.0
+FastAPI
+Uvicorn
+HTML
+CSS
+JavaScript
+Requests
+Jinja2
+
+--------------------------------------------------
+3. PROJECT STRUCTURE
+--------------------------------------------------
+
+a2a_standalone_app_py311/
+│
+├── .venv/
+├── server_agent.py
+├── client_agent.py
+├── interactive_client_agent.py
+├── requirements.txt
+├── guide.txt
+│
+├── static/
+│   ├── style.css
+│   └── app.js
+│
+└── templates/
+    └── index.html
+
+--------------------------------------------------
+4. HOW TO RUN
+--------------------------------------------------
+
+Terminal 1:
+
+cd a2a_standalone_app_py311
+.venv\Scripts\activate
+python server_agent.py
+
+Open browser:
+
+http://127.0.0.1:8000
+
+Optional Terminal 2:
+
+cd a2a_standalone_app_py311
+.venv\Scripts\activate
+python client_agent.py
+
+Or:
+
+python interactive_client_agent.py
+
+--------------------------------------------------
+5. FEATURES
+--------------------------------------------------
+
+Styled standalone web app
+ClientAgent to ServerAgent messaging
+FastAPI backend
+JSON API communication
+Overview side panel
+Live background logs
+Quick action buttons
+Interactive terminal client
+Simple client test file
+Python 3.11.0 virtual environment
+
+--------------------------------------------------
+6. SUBMISSION NOTE
+--------------------------------------------------
+
+This project demonstrates a basic A2A Hello World system using Python 3.11.0 and FastAPI.
+
+It shows how one agent can send a message to another agent through an API and receive a response.
+
+The app includes a modern UI and an overview panel that explains what is running in the background.

@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2A Standalone App - Python 3.11.0</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="bg-orb orb-one"></div>
+    <div class="bg-orb orb-two"></div>
+
+    <div class="app-shell">
+
+        <header class="topbar">
+            <div class="brand">
+                <div class="logo">
+                    <span></span>
+                </div>
+                <div>
+                    <h1>A2A Standalone</h1>
+                    <p>Agent-to-Agent Communication App • Python 3.11.0</p>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <div class="server-pill">
+                    <span></span>
+                    ServerAgent Online
+                </div>
+                <button class="overview-btn" id="overviewBtn">Overview</button>
+            </div>
+        </header>
+
+        <main class="main-grid">
+
+            <section class="hero-card">
+                <div class="badge">PYTHON 3.11.0 A2A DEMO</div>
+
+                <h2>Two agents talking through an API.</h2>
+
+                <p>
+                    This standalone app shows a simple Agent-to-Agent workflow.
+                    The browser acts as ClientAgent and sends messages to ServerAgent running in FastAPI.
+                </p>
+
+                <div class="flow-box">
+                    <div class="agent-card client">
+                        <small>Sender</small>
+                        <strong>ClientAgent</strong>
+                    </div>
+
+                    <div class="connector">
+                        <span>POST /message</span>
+                    </div>
+
+                    <div class="agent-card server">
+                        <small>Receiver</small>
+                        <strong>ServerAgent</strong>
+                    </div>
+                </div>
+
+                <div class="mini-info">
+                    <div>
+                        <strong>Python</strong>
+                        <span>3.11.0</span>
+                    </div>
+                    <div>
+                        <strong>Backend</strong>
+                        <span>FastAPI</span>
+                    </div>
+                    <div>
+                        <strong>Frontend</strong>
+                        <span>HTML CSS JS</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="chat-card">
+                <div class="chat-header">
+                    <div>
+                        <h3>Agent Console</h3>
+                        <p>Send a message from ClientAgent to ServerAgent.</p>
+                    </div>
+                    <span class="live-badge">LIVE</span>
+                </div>
+
+                <div class="chat-window" id="chatWindow">
+                    <div class="message bot">
+                        <span class="message-label">ServerAgent</span>
+                        <p>Hello! I am ready to receive A2A messages using Python 3.11.0.</p>
+                    </div>
+                </div>
+
+                <form class="input-area" id="messageForm">
+                    <input
+                        type="text"
+                        id="messageInput"
+                        placeholder="Type: Hello ServerAgent..."
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit">Send</button>
+                </form>
+
+                <div class="quick-actions">
+                    <button type="button" data-message="Hello ServerAgent">Hello</button>
+                    <button type="button" data-message="What is A2A?">What is A2A?</button>
+                    <button type="button" data-message="Status">Status</button>
+                    <button type="button" data-message="How are you?">Health</button>
+                    <button type="button" data-message="Python version">Python</button>
+                    <button type="button" data-message="Help">Help</button>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <aside class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <div>
+                <h2>System Overview</h2>
+                <p>Background workflow and live logs</p>
+            </div>
+            <button class="close-btn" id="closePanel">×</button>
+        </div>
+
+        <div class="panel-content">
+
+            <div class="overview-card">
+                <h3>What's Running</h3>
+                <ul class="status-list">
+                    <li><span></span> Python 3.11.0 virtual environment</li>
+                    <li><span></span> FastAPI backend server</li>
+                    <li><span></span> ServerAgent message endpoint</li>
+                    <li><span></span> Browser-based ClientAgent</li>
+                    <li><span></span> JavaScript fetch request system</li>
+                </ul>
+            </div>
+
+            <div class="overview-card">
+                <h3>How It Works</h3>
+                <ol>
+                    <li>User types a message in the app.</li>
+                    <li>ClientAgent prepares a JSON message.</li>
+                    <li>Message is sent to <b>/message</b>.</li>
+                    <li>ServerAgent receives and processes it.</li>
+                    <li>ServerAgent sends a JSON reply.</li>
+                    <li>The app displays the reply.</li>
+                </ol>
+            </div>
+
+            <div class="overview-card">
+                <h3>Live Background Logs</h3>
+                <div class="logs" id="logsBox">
+                    <p>Click refresh to load logs.</p>
+                </div>
+                <button class="refresh-btn" id="refreshOverview">Refresh Overview</button>
+            </div>
+
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
