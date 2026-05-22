@@ -1,0 +1,61 @@
+Project Description: A2A Standalone Agent Communication App
+
+This project is a Python 3.11.0 based Agent-to-Agent communication web application. It demonstrates how two simple agents can communicate with each other through an API. The project is built as a standalone web app using FastAPI for the backend and HTML, CSS, and JavaScript for the frontend.
+
+In this project, the browser acts as the ClientAgent, and the Python FastAPI server acts as the ServerAgent. When the user types a message in the web interface, the ClientAgent sends that message as a JSON request to the ServerAgent through the /message API endpoint. The ServerAgent receives the message, processes it, and sends a response back to the browser.
+
+The project supports both basic conversation and simple mathematical operations. The user can ask normal questions such as greetings, status checks, Python version, and A2A explanation. The user can also perform operations like addition, subtraction, multiplication, and division by typing commands such as add 10 and 20, subtract 50 and 15, multiply 6 and 7, or divide 100 by 5.
+
+The application also includes a styled web interface with an Overview panel. This panel explains what is running in the background, including the Python virtual environment, FastAPI backend, ServerAgent endpoint, math operation parser, browser ClientAgent, and JavaScript fetch communication. It also shows live background logs to help users understand how the system is working internally.
+
+This project is useful for understanding the basic concept of A2A, Agent-to-Agent communication, where one agent sends a request and another agent receives, processes, and replies to it. It is a beginner-friendly demonstration of how agents can communicate using API-based message passing.
+
+Technologies Used
+Python 3.11.0
+FastAPI
+Uvicorn
+Pydantic
+HTML
+CSS
+JavaScript
+Main Features
+Standalone styled web application
+ClientAgent to ServerAgent communication
+FastAPI backend server
+/message API endpoint
+JSON-based request and response system
+Basic question answering
+Addition operation
+Subtraction operation
+Multiplication operation
+Division operation
+Overview side panel
+Live background logs
+Python 3.11.0 virtual environment support
+How the Project Works
+The user opens the web app in the browser.
+The browser works as the ClientAgent.
+The user types a message or math command.
+JavaScript sends the message to the FastAPI backend using a POST request.
+The backend works as the ServerAgent.
+The ServerAgent checks whether the message is a normal question or a math operation.
+If it is a math operation, the server calculates the result.
+If it is a normal message, the server returns a basic response.
+The response is sent back as JSON.
+The browser displays the reply in the chat interface.
+Example Inputs
+Hello
+What is A2A?
+Status
+Python version
+add 10 and 20
+subtract 50 and 15
+multiply 6 and 7
+divide 100 by 5
+10 + 20
+50 - 15
+6 * 7
+100 / 5
+Short Description
+
+This project is a Python 3.11.0 FastAPI-based A2A Hello World web app that demonstrates simple Agent-to-Agent communication. The browser acts as a ClientAgent, while the FastAPI backend acts as a ServerAgent. The system can respond to basic messages and perform simple math operations through API-based communication.
