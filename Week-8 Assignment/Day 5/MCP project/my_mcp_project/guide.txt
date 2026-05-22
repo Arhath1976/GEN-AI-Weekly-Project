@@ -1,0 +1,276 @@
+﻿CUSTOM MCP SERVER PROJECT GUIDE
+===============================
+
+Project Name:
+Own MCP Server using Python 3.11
+
+--------------------------------------------------
+1. WHAT IS MCP?
+--------------------------------------------------
+
+MCP stands for Model Context Protocol.
+
+It is a protocol that allows AI assistants to connect with external tools, data, files, APIs, and services.
+
+In this project, we created our own MCP server using Python.
+
+The server provides tools that an AI system can call.
+
+--------------------------------------------------
+2. REQUIREMENTS
+--------------------------------------------------
+
+Install:
+
+1. Python 3.11.0
+2. Visual Studio Code
+3. Internet connection
+
+--------------------------------------------------
+3. PROJECT STRUCTURE
+--------------------------------------------------
+
+my_mcp_project/
+│
+├── .venv/
+├── server.py
+├── client_test.py
+├── requirements.txt
+└── guide.txt
+
+--------------------------------------------------
+4. CREATE VIRTUAL ENVIRONMENT
+--------------------------------------------------
+
+Run:
+
+py -3.11 -m venv .venv
+
+Activate:
+
+.venv\Scripts\activate
+
+--------------------------------------------------
+5. INSTALL PACKAGES
+--------------------------------------------------
+
+Run:
+
+pip install -r requirements.txt
+
+requirements.txt contains:
+
+mcp
+
+--------------------------------------------------
+6. RUN MCP SERVER
+--------------------------------------------------
+
+Run:
+
+python server.py
+
+If there is no error, the MCP server is working.
+
+The server waits for a client connection.
+
+--------------------------------------------------
+7. TEST MCP SERVER
+--------------------------------------------------
+
+Run:
+
+python client_test.py
+
+Expected tools:
+
+add_numbers
+subtract_numbers
+multiply_numbers
+get_student_details
+create_project_plan
+generate_study_schedule
+
+--------------------------------------------------
+8. AVAILABLE TOOLS
+--------------------------------------------------
+
+1. add_numbers
+
+Input:
+a, b
+
+Output:
+Sum of two numbers
+
+Example:
+add_numbers(10, 20)
+
+Output:
+30
+
+--------------------------------------------------
+
+2. subtract_numbers
+
+Input:
+a, b
+
+Output:
+Difference of two numbers
+
+Example:
+subtract_numbers(50, 15)
+
+Output:
+35
+
+--------------------------------------------------
+
+3. multiply_numbers
+
+Input:
+a, b
+
+Output:
+Product of two numbers
+
+Example:
+multiply_numbers(7, 6)
+
+Output:
+42
+
+--------------------------------------------------
+
+4. get_student_details
+
+Input:
+name
+
+Output:
+Sample student details
+
+Example:
+get_student_details("Haresh")
+
+--------------------------------------------------
+
+5. create_project_plan
+
+Input:
+project_name
+
+Output:
+Step-by-step project plan
+
+Example:
+create_project_plan("AI Portfolio Website")
+
+--------------------------------------------------
+
+6. generate_study_schedule
+
+Input:
+subject, days
+
+Output:
+Day-wise study schedule
+
+Example:
+generate_study_schedule("Python", 3)
+
+--------------------------------------------------
+9. PROJECT EXPLANATION
+--------------------------------------------------
+
+This project demonstrates how to create a custom MCP server.
+
+The server exposes tools using Python functions.
+
+An AI client can connect to this MCP server and call the tools.
+
+This is useful because AI assistants can use MCP to access external features in a standard way.
+
+--------------------------------------------------
+10. HOW TO RUN
+--------------------------------------------------
+
+Step 1:
+Open VS Code terminal.
+
+Step 2:
+Go to project folder:
+
+cd my_mcp_project
+
+Step 3:
+Activate virtual environment:
+
+.venv\Scripts\activate
+
+Step 4:
+Run client test:
+
+python client_test.py
+
+--------------------------------------------------
+11. COMMON ERRORS AND FIXES
+--------------------------------------------------
+
+ERROR:
+Python was not found
+
+Fix:
+Install Python 3.11.0 and tick Add Python to PATH.
+
+--------------------------------------------------
+
+ERROR:
+No module named mcp
+
+Fix:
+Activate virtual environment:
+
+.venv\Scripts\activate
+
+Install package:
+
+pip install -r requirements.txt
+
+--------------------------------------------------
+
+ERROR:
+py -3.11 not working
+
+Fix:
+Try:
+
+python -m venv .venv
+
+--------------------------------------------------
+
+ERROR:
+Server keeps running and does not show output
+
+Meaning:
+This is normal. MCP server waits for a client.
+
+To test properly, run:
+
+python client_test.py
+
+--------------------------------------------------
+12. SUBMISSION NOTE
+--------------------------------------------------
+
+This project is a custom Model Context Protocol server built with Python.
+
+It demonstrates:
+- MCP server creation
+- Tool registration
+- Resource registration
+- Client-server communication
+- Tool calling through MCP
+
+The project is suitable for demonstrating Agentic AI tool integration.
