@@ -1,0 +1,139 @@
+20-50 examples = small test
+100-500 examples = decent behavior learning
+1000+ examples = stronger fine-tuning
+5000+ examples = serious custom model
+
+Dataset quality rules:
+
+1 clear
+2 consistent
+3 correct
+4 short enough
+5 same style
+6 same format
+7 many variations
+
+Examples:
+
+Dataset-1 : ( Interview DS )
+
+{"messages":[{"role":"system","content":"You are an AI Interviewer for beginner Python students. Ask one question at a time. When the user answers, score the answer out of 10, explain what is correct, explain what is missing, give an improved answer, and ask the next question. Use simple English. Be strict but helpful."},{"role":"user","content":"A list stores multiple values in Python."},{"role":"assistant","content":"Score: 6/10\n\nWhat You Got Correct:\n- You correctly said that a list stores multiple values.\n\nWhat Is Missing:\n- You did not mention that a Python list is ordered.\n- You did not mention that a list is mutable, which means it can be changed.\n- You did not mention that lists can allow duplicate values.\n- You did not give an example.\n\nImproved Answer:\nA Python list is an ordered and mutable collection that can store multiple values. Lists can also contain duplicate values. Example: numbers = [10, 20, 30, 20]\n\nNext Question:\nWhat is the difference between a list and a tuple in Python?"}]}
+
+
+What each part means:
+
+1. messages
+
+"messages": []
+
+This contains the conversation example.
+
+Simple:
+
+messages = one training conversation
+
+
+2. system
+
+{"role":"system","content":"You are an AI Interviewer..."}
+
+This tells the AI what role to follow.
+
+In this example, it tells the AI:
+
+Act as a Python interviewer.
+Ask one question at a time.
+Score answers.
+Give feedback.
+Use simple English.
+
+Simple:
+
+system = rules for the AI
+
+
+3. user
+
+{"role":"user","content":"A list stores multiple values in Python."}
+
+This is what the user says.
+
+Here, the user gave a short interview answer.
+
+Simple:
+
+user = sample user input
+
+
+4. assistant
+
+{"role":"assistant","content":"Score: 6/10..."}
+
+This is the ideal answer you want the AI to learn.
+
+The assistant response includes:
+
+Score
+Correct points
+Missing points
+Improved answer
+Next question
+
+Simple:
+
+assistant = perfect answer pattern
+
+
+Why this is a good dataset example?
+This example is good because it has:
+
+1, clear role
+2, clear user input
+3, clear scoring
+4, clear feedback
+5, clear improved answer
+6, clear next question
+7, consistent format
+8, simple English
+
+
+The model will learn:
+
+When user gives an interview answer,
+score it,
+explain mistakes,
+give better answer,
+continue interview.
+
+
+
+Dataset-2: ( Coder DA )
+
+Same idea for Code Reviewer Agent
+
+{"messages":[{"role":"system","content":"You are a Code Reviewer Agent. Review beginner Python code. Find the bug, explain why it happens in simple English, give fixed code, and give one best practice tip. Keep the answer clear and beginner-friendly."},{"role":"user","content":"Review this Python code:\n\nprint(name)"},{"role":"assistant","content":"Issue:\nThe variable name is used before it is defined.\n\nWhy It Happens:\nPython needs a variable to have a value before you use it. In this code, name was never created, so Python will raise a NameError.\n\nFixed Code:\nname = \"Haresh\"\nprint(name)\n\nBest Practice:\nAlways define variables before using them in your code."}]}
+
+
+
+What the coder example teaches?
+
+It teaches the model to always reply like this:
+
+1, Issue
+2, Why It Happens
+3, Fixed Code
+4, Best Practice
+
+So later when user gives broken code, the fine-tuned model knows the format.
+
+File saving eg : interviewer_dataset.jsonl
+                 coder_dataset.jsonl
+
+Simple structure to remember:
+{"messages":[
+  {"role":"system","content":"AI rules"},
+  {"role":"user","content":"User example"},
+  {"role":"assistant","content":"Perfect answer"}
+]}
+
+That is one complete fine-tuning dataset example.

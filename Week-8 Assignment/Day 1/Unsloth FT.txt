@@ -1,0 +1,213 @@
+1. What fine-tuning means
+
+Fine-tuning means taking an already-trained model and training it more on your own dataset so it becomes better for your specific use case. It can customize behavior, add domain knowledge, and improve performance for a task.
+
+Simple:
+
+Fine-tuning = make a general AI model become specialized.
+
+Example:
+
+Normal model = general assistant
+Fine-tuned model = interview bot / code reviewer / legal assistant / stock sentiment bot
+
+
+2. Fine-tuning can do 3 main things
+
+According to the guide, fine-tuning can help with:
+
+Learn new domain knowledge
+Customize tone, personality, and response style
+Improve accuracy for a specific task
+
+Simple:
+
+Fine-tuning teaches the AI what to know, how to reply, and how to perform a task better.
+
+
+
+3. Common fine-tuning methods
+
+The guide mentions these important methods:
+
+SFT
+DPO / ORPO
+RL / GRPO / GSPO
+Distillation
+LoRA
+QLoRA
+Full fine-tuning
+Continued pretraining
+
+But for beginners, the most important ones are:
+
+SFT
+LoRA
+QLoRA
+
+SFT means training using correct examples. LoRA trains small adapter weights instead of the full model. QLoRA is LoRA with 4-bit quantization to save memory.
+
+
+
+4. LoRA and QLoRA are the beginner-friendly methods
+
+LoRA does not train the whole model. It keeps the main model mostly frozen and trains small extra parts. QLoRA makes it even lighter by using 4-bit quantization, which saves memory.
+
+Simple:
+
+Full fine-tuning = train the whole brain
+LoRA = train small add-on parts
+QLoRA = train small add-on parts with compressed memory
+
+For your learning:
+
+Start with QLoRA.
+
+The guide also recommends QLoRA as one of the most accessible and effective starting methods.
+
+
+
+5. Do not start with full fine-tuning
+
+Full fine-tuning uses much more compute and memory. The guide says beginners should test with LoRA or QLoRA first, because if LoRA fails, full fine-tuning will not magically fix everything.
+
+Simple:
+
+Do not jump to full fine-tuning first.
+Start small with LoRA/QLoRA.
+
+
+
+6. Choose the right model first
+
+The guide recommends beginners start with a small instruct model, like an 8B model, and experiment from there. It also says instruct models are easier because they already understand chat-style conversations and need less data than base models.
+
+Simple:
+
+Beginner choice = small instruct model
+Not beginner choice = huge base model
+
+Example:
+
+Good beginner path:
+Llama 3.1 8B Instruct / Qwen small instruct model + QLoRA
+
+
+
+7. Dataset quality is extremely important
+
+Your dataset decides how good the fine-tuned model becomes. The guide says datasets usually need question-answer style columns, and quality + amount strongly affect the final result.
+
+Simple:
+
+Bad dataset = bad model
+Good dataset = useful model
+
+For your AI Interviewer bot, dataset examples could be:
+
+Question
+User answer
+Score
+Feedback
+Better answer
+Next question
+
+
+
+8. Do not just dump random data
+
+The guide says dumping documents alone is usually not the best method. For better results, structure your data into clean question-answer pairs. But for some use cases like code, raw code repositories can still help.
+
+Simple:
+
+Best dataset = clean examples
+Not best = random messy text
+
+
+
+9. Important training settings
+
+The guide highlights settings like:
+
+max_seq_length
+dtype
+load_in_4bit
+load_in_16bit
+full_finetuning
+load_in_8bit
+
+Important simple meanings:
+
+max_seq_length = how much text the model can see during training
+load_in_4bit = use QLoRA / save memory
+load_in_16bit = use LoRA
+full_finetuning = train full model
+dtype = precision type for GPU
+
+Only one main training method should be enabled at a time.
+
+
+
+10. Train and serve in the same precision
+
+The guide says training and serving in the same precision helps preserve accuracy. Meaning, if you want to run the model in 4-bit, it is better to train in 4-bit too.
+
+Simple:
+
+If you will use 4-bit model later, train in 4-bit.
+
+
+
+11. Unsloth can run on notebooks or locally
+
+The guide says beginners should start with Unsloth notebooks because they are easier and guided. Local installation is also possible through Docker or pip install, depending on your system and GPU resources.
+
+Simple:
+
+Beginner = use notebook
+Advanced = local install / Docker
+
+
+
+12. Unsloth is useful because it reduces training difficulty
+
+Unsloth says you can fine-tune or do RL on Colab, Kaggle, or locally with low VRAM using their notebooks. The guide mentions as low as 3GB VRAM for some setups.
+
+Simple:
+
+Unsloth = easier, faster, lower-memory fine-tuning.
+Core workflow
+
+
+
+The full idea is:
+
+1. Choose model
+2. Choose method: QLoRA / LoRA / SFT
+3. Prepare clean dataset
+4. Set training parameters
+5. Train with Unsloth
+6. Test model
+7. Export/use model
+
+
+Most important takeaway
+
+Start with a small instruct model.
+Use QLoRA first.
+Prepare a clean dataset.
+Do not jump into full fine-tuning.
+Dataset quality matters more than everything.
+
+
+For your project, if you fine-tune later, the best starting method is:
+
+SFT + QLoRA using Unsloth
+
+
+Because you can train your separate bots like:
+
+AI Interviewer
+Code Reviewer
+Game Dev Agent
+Website Builder Agent, with clean example conversations.

@@ -1,0 +1,10 @@
+1. Full fine-tuning
+2. LoRA
+3. QLoRA
+4. Adapter tuning
+5. Prefix tuning
+6. Prompt tuning
+7. Instruction fine-tuning
+8. Supervised fine-tuning
+9. RLHF / preference tuning
+10. Continued pretraining
