@@ -1,0 +1,408 @@
+ADK AGENTIC AI PROJECT GUIDE
+============================
+
+Project Name:
+ADK Agentic AI using Python 3.11 and Google ADK
+
+--------------------------------------------------
+1. REQUIREMENTS
+--------------------------------------------------
+
+Before running this project, install the following:
+
+1. Python 3.11.0
+   Download:
+   https://www.python.org/downloads/release/python-3110/
+
+   Important:
+   During installation, tick:
+   [x] Add Python to PATH
+
+2. Visual Studio Code
+   Download:
+   https://code.visualstudio.com/
+
+3. Google Gemini API Key
+   Get API key from:
+   https://aistudio.google.com/apikey
+
+4. Internet connection
+
+--------------------------------------------------
+2. PROJECT FOLDER STRUCTURE
+--------------------------------------------------
+
+The project should look like this:
+
+adk_agent_project/
+│
+├── .venv/
+│
+└── my_agent/
+    ├── __init__.py
+    ├── agent.py
+    └── .env
+
+--------------------------------------------------
+3. OPEN PROJECT IN VS CODE
+--------------------------------------------------
+
+Open Visual Studio Code.
+
+Then open the folder:
+
+adk_agent_project
+
+Open the VS Code terminal:
+
+Terminal > New Terminal
+
+--------------------------------------------------
+4. CREATE VIRTUAL ENVIRONMENT
+--------------------------------------------------
+
+In the VS Code terminal, run:
+
+py -3.11 -m venv .venv
+
+If the above command does not work, try:
+
+python -m venv .venv
+
+--------------------------------------------------
+5. ACTIVATE VIRTUAL ENVIRONMENT
+--------------------------------------------------
+
+Run this command in VS Code terminal:
+
+.venv\Scripts\activate
+
+After activation, the terminal should show:
+
+(.venv)
+
+Example:
+
+(.venv) PS C:\Users\YourName\Desktop\adk_agent_project>
+
+--------------------------------------------------
+6. INSTALL REQUIRED PACKAGES
+--------------------------------------------------
+
+Run:
+
+pip install --upgrade pip
+
+Then run:
+
+pip install google-adk python-dotenv
+
+--------------------------------------------------
+7. ADD GEMINI API KEY
+--------------------------------------------------
+
+Open this file:
+
+my_agent\.env
+
+Inside the file, add:
+
+GOOGLE_GENAI_USE_VERTEXAI=0
+GOOGLE_API_KEY=PASTE_YOUR_GEMINI_API_KEY_HERE
+
+Replace:
+
+PASTE_YOUR_GEMINI_API_KEY_HERE
+
+with your real Gemini API key.
+
+Example:
+
+GOOGLE_GENAI_USE_VERTEXAI=0
+GOOGLE_API_KEY=AIzaSyxxxxxxxxxxxxxxxxxxxxxxxx
+
+Important:
+Do not add quotes around the API key.
+
+Correct:
+
+GOOGLE_API_KEY=AIzaSyxxxx
+
+Wrong:
+
+GOOGLE_API_KEY="AIzaSyxxxx"
+
+--------------------------------------------------
+8. RUN THE AGENT IN TERMINAL
+--------------------------------------------------
+
+Make sure you are inside the main project folder:
+
+adk_agent_project
+
+Then run:
+
+adk run my_agent
+
+Now you can chat with the agent in the terminal.
+
+Test messages:
+
+hello
+
+Calculate 25 * 12 + 10
+
+What is the time in Chennai?
+
+Create a plan to build a portfolio website
+
+--------------------------------------------------
+9. RUN THE AGENT IN WEB UI
+--------------------------------------------------
+
+To open the ADK web interface, run:
+
+adk web
+
+Then open this link in your browser:
+
+http://127.0.0.1:8000
+
+Select the agent:
+
+my_agent
+
+Then start chatting.
+
+--------------------------------------------------
+10. HOW TO STOP THE SERVER
+--------------------------------------------------
+
+To stop ADK web or ADK run, press:
+
+CTRL + C
+
+in the terminal.
+
+--------------------------------------------------
+11. COMMON ERRORS AND FIXES
+--------------------------------------------------
+
+ERROR 1:
+'adk' is not recognized as an internal or external command
+
+Fix:
+
+Make sure virtual environment is activated:
+
+.venv\Scripts\activate
+
+Then install ADK again:
+
+pip install google-adk
+
+Then run:
+
+adk web
+
+If it still does not work, try:
+
+python -m adk web
+
+--------------------------------------------------
+
+ERROR 2:
+429 RESOURCE_EXHAUSTED
+
+Meaning:
+
+Your Gemini API quota is exhausted.
+This is not a coding error.
+
+Fix options:
+
+1. Wait for some time and try again.
+2. Create a new API key from:
+   https://aistudio.google.com/apikey
+3. Replace the old key in:
+   my_agent\.env
+4. Restart ADK:
+
+CTRL + C
+adk web
+
+--------------------------------------------------
+
+ERROR 3:
+No module named google.adk
+
+Fix:
+
+Activate virtual environment:
+
+.venv\Scripts\activate
+
+Install package:
+
+pip install google-adk
+
+--------------------------------------------------
+
+ERROR 4:
+Agent not showing in ADK web
+
+Fix:
+
+Make sure folder structure is correct:
+
+adk_agent_project/
+└── my_agent/
+    ├── __init__.py
+    ├── agent.py
+    └── .env
+
+Make sure you run this command from the main folder:
+
+adk web
+
+Do not run it from inside my_agent folder.
+
+--------------------------------------------------
+
+ERROR 5:
+API key not working
+
+Fix:
+
+Check my_agent\.env file.
+
+It should contain:
+
+GOOGLE_GENAI_USE_VERTEXAI=0
+GOOGLE_API_KEY=YOUR_REAL_API_KEY
+
+Make sure:
+- There are no quotes
+- There are no extra spaces
+- The API key is valid
+- The file name is exactly .env
+
+--------------------------------------------------
+12. PROJECT FILE DETAILS
+--------------------------------------------------
+
+File 1:
+
+my_agent\__init__.py
+
+This file loads the agent module.
+
+Content:
+
+from . import agent
+
+--------------------------------------------------
+
+File 2:
+
+my_agent\.env
+
+This file stores the Gemini API key.
+
+Content:
+
+GOOGLE_GENAI_USE_VERTEXAI=0
+GOOGLE_API_KEY=PASTE_YOUR_GEMINI_API_KEY_HERE
+
+--------------------------------------------------
+
+File 3:
+
+my_agent\agent.py
+
+This file contains the main ADK agent code.
+
+The agent can:
+- Chat with the user
+- Use tools
+- Calculate simple math
+- Create task plans
+- Return demo city time
+
+--------------------------------------------------
+13. FINAL CHECKLIST
+--------------------------------------------------
+
+Before submitting or running the project, check:
+
+[ ] Python 3.11 installed
+[ ] VS Code installed
+[ ] Project folder opened in VS Code
+[ ] Virtual environment created
+[ ] Virtual environment activated
+[ ] google-adk installed
+[ ] python-dotenv installed
+[ ] Gemini API key added in .env
+[ ] agent.py exists
+[ ] __init__.py exists
+[ ] adk web opens successfully
+[ ] my_agent appears in browser
+[ ] Agent responds without quota error
+
+--------------------------------------------------
+14. IMPORTANT NOTE
+--------------------------------------------------
+
+If the web interface opens and the agent appears, the project setup is correct.
+
+If you get:
+
+429 RESOURCE_EXHAUSTED
+
+then the project is still correct.
+The only problem is Gemini API quota exhaustion.
+
+This means the API limit is over, not that the code is wrong.
+
+--------------------------------------------------
+15. COMMAND SUMMARY
+--------------------------------------------------
+
+Create virtual environment:
+
+py -3.11 -m venv .venv
+
+Activate virtual environment:
+
+.venv\Scripts\activate
+
+Install packages:
+
+pip install --upgrade pip
+pip install google-adk python-dotenv
+
+Run terminal agent:
+
+adk run my_agent
+
+Run web UI:
+
+adk web
+
+Stop server:
+
+CTRL + C
+
+--------------------------------------------------
+16. SUBMISSION NOTE
+--------------------------------------------------
+
+This project is an Agentic AI application built using:
+
+- Python 3.11
+- Google Agent Development Kit
+- Gemini API
+- Custom Python tools
+- ADK Web UI
+
+The project successfully creates an AI agent that can understand user requests, decide when to use tools, and respond with useful answers.
